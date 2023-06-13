@@ -24,8 +24,10 @@ mv /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
 # change lines in wp-config.php to connect to database, using values from .env file
 sed -i "s/database_name_here/$DB_NAME/g" wp-config.php
 sed -i "s/username_here/$DB_USER/g" wp-config.php
-sed -i "s/password_here/$DB_PWD/g" wp-config.php
+sed -i "s/password_here/$DB_PASSWORD/g" wp-config.php
 sed -i "s/localhost/$DB_HOSTNAME/g" wp-config.php
+
+#wp config --dbhost=$DB_HOST --dbname=$DB_NAME --dbuser=$DB_USER --dbpass=$DB_PASSWORD --allow-root
 
 # install wordpress and set up basic settings
 wp core install --url=$DOMAIN_NAME/ --title=$WP_TITLE --admin_user=$WP_ADMIN_USER --admin_password=$WP_ADMIN_PASSWORD --admin_email=$WP_ADMIN_EMAIL --skip-email --allow-root
@@ -76,4 +78,4 @@ wp redis enable --allow-root
 
 		
 # start php-fpm service, -F flag tells service to run in foreground instead of background
-/usr/sbin/php-fpm7.3 -F
+php-fpm7.3 -F
