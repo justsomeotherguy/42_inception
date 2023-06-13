@@ -16,7 +16,7 @@ RUN apt-get install -y curl php php-cgi php-mysql php-fpm php-pdo php-gd php-cli
 
 # copy config files to wordpress conf location
 
-#COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/
+COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d/
 
 #COPY ./conf/index.php /var/www/html/wordpress/index.php
 

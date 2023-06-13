@@ -1,20 +1,44 @@
 #!/bin/sh
-service mysql start
+
+mysql_install_db
+
+/etc/init.d/mysql start
+
+# check if installation exists
+
+if [ -d "/var/lib/mysql/$DB_NAME" ]
+then
+		echo "Database already exists"
+else
+
+# preset commands to install mysql with root password set
+
+mysql_secure_installation << _EOF_
+
+Y
+TheBestPassword123456
+TheBestPassword123456
+Y
+n
+Y
+Y
+_EOF_
+
+# set root to allow 127.0.0.1 connections
+echo "GRANT ALL ON *.* to 'root'@'%' IDENTIFIED BY '$DB_ROOT_PWD';" | mysql -uroot
+echo "FLUSH PRIVILEGES;" | mysql -uroot
 
 # create database
-echo "CREATE DATABASE IF NOT EXISTS $DB_NAME ;" > dbexec.sql
+echo "CREATE DATABASE IF NOT EXISTS $DB_NAME;" | mysql -uroot
 
-# create user
+# add user to database with credentials
+echo "GRANT ALL ON $DB_NAME.* TO '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';" | mysql -uroot
+echo "FLUSH PRIVILEGES;" | mysql -uroot
 
-echo "CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PWD' ;" >> dbexec.sql
-echo "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%' ;" >> dbexec.sql
+mysql -uroot -p$DB_ROOT_PASSWORD $DB_NAME < /usr/local/bin/wordpress.sql
 
-echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '12345' ;" >> dbexec.sql
+fi
 
-echo "FLUSH PRIVILEGES;" >> dbexec.sql
+/etc/init.d/mysql stop
 
-mysql < dbexec.sql
-
-kill $(cat /var/run/mysqld/mysqld.pid)
-
-mysqld
+exec "$@"
